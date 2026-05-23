@@ -1,0 +1,49 @@
+name: Daily price scrape
+
+on:
+  schedule:
+    # 06:30 UTC daily (07:30 CET / 08:30 CEST). Cron is UTC.
+    - cron: "30 6 * * *"
+  workflow_dispatch:  # allow manual trigger from Actions tab
+
+permissions:
+  contents: write  # needed to commit updated data/prices.csv
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Install Playwright Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run scraper
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python -m src.cli --config config.yaml
+
+      - name: Commit updated CSV
+        run: |
+          if git diff --quiet -- data/prices.csv; then
+            echo "No price changes today."
+            exit 0
+          fi
+          git config user.name "price-monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/prices.csv
+          git commit -m "chore(data): scrape $(date -u +%Y-%m-%d)"
+          git push

@@ -1,0 +1,72 @@
+# Competitor Price Monitor - target configuration
+#
+# The default targets point at books.toscrape.com, a sandbox site purpose-built
+# for scraper practice. It is the safest default for a public template repo:
+# zero anti-bot, no terms-of-service grey area, and a perfectly stable DOM.
+#
+# To monitor real e-commerce competitors, replace these targets with your own
+# category or listing URLs. The scraper tries JSON-LD Product schema first,
+# falls back to microdata, then to the CSS selectors below. Most modern stores
+# publish JSON-LD for SEO, so the JSON-LD path covers Shopify, BigCommerce,
+# WooCommerce, Magento, Shoptet, and PrestaShop out of the box.
+
+targets:
+  - name: "books_travel"
+    label: "books.toscrape.com - Travel"
+    url: "https://books.toscrape.com/catalogue/category/books/travel_2/index.html"
+    max_products: 12
+
+  - name: "books_mystery"
+    label: "books.toscrape.com - Mystery"
+    url: "https://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
+    max_products: 12
+
+# Selector strategy is layered. The scraper tries each in order until one
+# yields results. Edit these without touching code when a site redesigns.
+#
+# The defaults below cover books.toscrape.com (product_pod, price_color,
+# availability) and common e-commerce patterns (itemprop microdata, generic
+# product/price class names).
+selectors:
+  product_card:
+    - "article.product_pod"
+    - "[data-testid='product-card']"
+    - ".product-list .product"
+    - "article.product"
+    - ".product-item"
+  product_name:
+    - "h3 a"
+    - "[itemprop='name']"
+    - ".product-name"
+    - "h2 a"
+  product_price:
+    - ".price_color"
+    - "[itemprop='price']"
+    - ".price-final"
+    - ".product-price"
+    - ".price"
+  product_url:
+    - "h3 a"
+    - "a[itemprop='url']"
+    - "h2 a"
+    - "a.product-link"
+  in_stock_indicator:
+    - ".availability.instock"
+    - "[itemprop='availability'][content*='InStock']"
+    - ".in-stock"
+
+# Alerting: send Slack notification when a product drops below this fraction of
+# its rolling 14-day max. 0.90 means alert on any 10%+ price drop.
+alerts:
+  drop_threshold: 0.90
+  lookback_days: 14
+
+# Politeness: do not hammer the target.
+request:
+  delay_between_targets_seconds: 4
+  page_timeout_seconds: 30
+  user_agent: "CompetitorPriceMonitor/0.1 (+https://github.com/zdenekbrdy-beep/competitor-price-monitor)"
+
+# Output
+output:
+  csv_path: "data/prices.csv"
