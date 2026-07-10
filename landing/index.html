@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PriceList Pilot — supplier price lists, handled</title>
+<meta name="description" content="Forward any supplier price list — Excel, CSV, PDF, even an email attachment. PriceList Pilot maps it to your catalog, shows the margin impact, and updates your store.">
+<style>
+  :root{
+    --paper:#FAFAF7;
+    --ink:#20242C;
+    --ink-soft:#5A6170;
+    --rule:#DFE2D9;
+    --margin-red:#C25E5A;
+    --accent:#2F5FA8;
+    --accent-ink:#FFFFFF;
+    --bad:#B4443C;
+    --bad-bg:#F6E7E5;
+    --good:#33735B;
+    --good-bg:#E4EFE9;
+    --warn:#8A6A2F;
+    --warn-bg:#F4ECDA;
+    --card:#FFFFFF;
+    --card-line:#E7E9E1;
+    --shadow:0 1px 2px rgba(32,36,44,.06),0 8px 24px rgba(32,36,44,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#171A21;
+      --ink:#E8E9E4;
+      --ink-soft:#9AA1AE;
+      --rule:#2A2E38;
+      --margin-red:#A85B57;
+      --accent:#7DA4E0;
+      --accent-ink:#10131A;
+      --bad:#E08A80;
+      --bad-bg:#3A2523;
+      --good:#7DBFA0;
+      --good-bg:#1F3229;
+      --warn:#D9B36B;
+      --warn-bg:#37301F;
+      --card:#1E222B;
+      --card-line:#2C313C;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#171A21; --ink:#E8E9E4; --ink-soft:#9AA1AE; --rule:#2A2E38;
+    --margin-red:#A85B57; --accent:#7DA4E0; --accent-ink:#10131A;
+    --bad:#E08A80; --bad-bg:#3A2523; --good:#7DBFA0; --good-bg:#1F3229;
+    --warn:#D9B36B; --warn-bg:#37301F; --card:#1E222B; --card-line:#2C313C;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"]{
+    --paper:#FAFAF7; --ink:#20242C; --ink-soft:#5A6170; --rule:#DFE2D9;
+    --margin-red:#C25E5A; --accent:#2F5FA8; --accent-ink:#FFFFFF;
+    --bad:#B4443C; --bad-bg:#F6E7E5; --good:#33735B; --good-bg:#E4EFE9;
+    --warn:#8A6A2F; --warn-bg:#F4ECDA; --card:#FFFFFF; --card-line:#E7E9E1;
+    --shadow:0 1px 2px rgba(32,36,44,.06),0 8px 24px rgba(32,36,44,.07);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 31px, var(--rule) 31px 32px),
+      var(--paper);
+    color:var(--ink);
+    font:400 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  /* accounting-ledger double margin line */
+  .sheet{
+    max-width:1060px;margin:0 auto;padding:0 28px 0 56px;position:relative;
+  }
+  .sheet::before{
+    content:"";position:absolute;top:0;bottom:0;left:32px;width:5px;
+    border-left:1.5px solid var(--margin-red);
+    border-right:1.5px solid var(--margin-red);
+    opacity:.55;pointer-events:none;
+  }
+  @media (max-width:640px){
+    .sheet{padding-left:34px}
+    .sheet::before{left:16px}
+  }
+
+  h1,h2,h3{font-family:Rockwell,"Roboto Slab","Zilla Slab",Charter,Georgia,serif;line-height:1.15;text-wrap:balance;margin:0}
+  h1{font-size:clamp(34px,5.4vw,56px);font-weight:700;letter-spacing:-.01em}
+  h2{font-size:clamp(24px,3.4vw,34px);font-weight:700}
+  h3{font-size:19px;font-weight:700}
+  p{margin:0}
+  a{color:var(--accent)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-variant-numeric:tabular-nums}
+  .eyebrow{
+    font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--margin-red);
+    font-weight:600;
+  }
+  .muted{color:var(--ink-soft)}
+  .measure{max-width:62ch}
+
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:20px 0 12px;border-bottom:1.5px solid var(--rule);
+  }
+  .wordmark{font-family:Rockwell,"Roboto Slab",Charter,Georgia,serif;font-weight:700;font-size:19px;letter-spacing:.01em}
+  .wordmark .tick{color:var(--margin-red)}
+  .topctas{display:flex;align-items:center;gap:10px}
+  .lang{
+    border:1.5px solid var(--rule);background:transparent;color:var(--ink-soft);
+    border-radius:4px;padding:5px 10px;font:600 13px/1 inherit;cursor:pointer;
+  }
+  .lang:hover{color:var(--ink)}
+
+  .btn{
+    display:inline-block;background:var(--accent);color:var(--accent-ink);
+    text-decoration:none;font-weight:650;font-size:15.5px;
+    padding:12px 22px;border-radius:4px;border:none;cursor:pointer;
+  }
+  .btn:hover{filter:brightness(1.07)}
+  .btn.small{padding:8px 14px;font-size:13.5px}
+  .btn:focus-visible,.lang:focus-visible,a:focus-visible{outline:2.5px solid var(--margin-red);outline-offset:2px}
+
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:64px 0 56px}
+  @media (max-width:880px){.hero{grid-template-columns:1fr;gap:36px}}
+  .hero .lede{font-size:19.5px;margin-top:18px;max-width:54ch;color:var(--ink-soft)}
+  .hero .cta-row{margin-top:28px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .hero .cta-note{font-size:13.5px;color:var(--ink-soft)}
+
+  /* demo card: the parsed price list */
+  .demo{
+    background:var(--card);border:1px solid var(--card-line);border-radius:8px;
+    box-shadow:var(--shadow);overflow:hidden;font-size:14px;
+  }
+  .demo .filebar{
+    display:flex;align-items:center;gap:8px;padding:10px 14px;
+    border-bottom:1px solid var(--card-line);color:var(--ink-soft);font-size:12.5px;
+  }
+  .demo .filebar .fname{font-weight:600;color:var(--ink)}
+  .demo table{width:100%;border-collapse:collapse}
+  .demo td{padding:11px 14px;border-top:1px solid var(--card-line);vertical-align:top}
+  .demo tr:first-child td{border-top:none}
+  .demo .sku{color:var(--ink-soft);font-size:12px}
+  .chip{
+    display:inline-block;border-radius:3px;padding:2px 8px;font-size:12px;font-weight:650;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:nowrap;
+  }
+  .chip.bad{background:var(--bad-bg);color:var(--bad)}
+  .chip.good{background:var(--good-bg);color:var(--good)}
+  .chip.warn{background:var(--warn-bg);color:var(--warn)}
+  .delta{font-weight:650}
+  .delta.up{color:var(--bad)}
+  .delta.down{color:var(--good)}
+  .demo .foot{
+    padding:12px 14px;border-top:1.5px dashed var(--card-line);
+    display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .stamp{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--margin-red);border:2px solid var(--margin-red);border-radius:3px;
+    padding:4px 9px;transform:rotate(-2deg);opacity:.9;
+  }
+
+  section{padding:56px 0;border-top:1.5px solid var(--rule)}
+  .sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:34px}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  @media (max-width:820px){.grid3{grid-template-columns:1fr}}
+  .paincard h3{margin-bottom:8px}
+  .paincard p{color:var(--ink-soft);font-size:15.5px}
+  .paincard .pk{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:var(--margin-red);font-size:13px;font-weight:700;display:block;margin-bottom:10px;
+  }
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;counter-reset:step}
+  @media (max-width:820px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--card);border:1px solid var(--card-line);border-radius:8px;padding:22px;box-shadow:var(--shadow)}
+  .step::before{
+    counter-increment:step;content:counter(step);
+    display:inline-flex;align-items:center;justify-content:center;
+    width:30px;height:30px;border-radius:50%;
+    background:var(--accent);color:var(--accent-ink);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;font-size:14px;
+    margin-bottom:14px;
+  }
+  .step h3{margin-bottom:8px}
+  .step p{color:var(--ink-soft);font-size:15.5px}
+
+  .watchlist{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;max-width:760px}
+  @media (max-width:680px){.watchlist{grid-template-columns:1fr}}
+  .watchitem{display:flex;gap:12px;align-items:flex-start}
+  .watchitem .dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:var(--margin-red);margin-top:8px}
+  .watchitem b{display:block}
+  .watchitem span{color:var(--ink-soft);font-size:15px}
+
+  .platforms{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+  .platform{
+    border:1.5px solid var(--rule);border-radius:4px;padding:8px 16px;
+    font-weight:650;font-size:14.5px;background:var(--card);
+  }
+  .platform small{display:block;font-weight:500;color:var(--ink-soft);font-size:12px}
+
+  .evidence{background:var(--card);border:1px solid var(--card-line);border-radius:8px;padding:26px;box-shadow:var(--shadow)}
+  .evidence ul{margin:14px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:10px}
+  .evidence li{color:var(--ink-soft);font-size:15px}
+
+  .faq{max-width:760px;display:flex;flex-direction:column;gap:8px}
+  .faq details{border:1px solid var(--card-line);border-radius:6px;background:var(--card);padding:0}
+  .faq summary{cursor:pointer;font-weight:650;padding:15px 18px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  .faq summary::after{content:"+";color:var(--margin-red);font-weight:700}
+  .faq details[open] summary::after{content:"–"}
+  .faq .a{padding:0 18px 16px;color:var(--ink-soft);font-size:15.5px;max-width:65ch}
+
+  .final{padding:72px 0;text-align:left}
+  .final .btn{margin-top:24px}
+
+  footer{border-top:1.5px solid var(--rule);padding:26px 0 48px;font-size:13.5px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  footer a{color:inherit}
+
+  /* language switching */
+  :root[data-lang="cs"] .en{display:none !important}
+  :root:not([data-lang="cs"]) .cs{display:none !important}
+
+  @media (prefers-reduced-motion: no-preference){
+    .demo tr{animation:rowin .5s ease both}
+    .demo tr:nth-child(2){animation-delay:.15s}
+    .demo tr:nth-child(3){animation-delay:.3s}
+    @keyframes rowin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="top">
+    <div class="wordmark">PriceList<span class="tick">▸</span>Pilot</div>
+    <div class="topctas">
+      <button class="lang" id="langBtn" type="button" aria-label="Switch language">CZ</button>
+      <a class="btn small" href="#early">
+        <span class="en">Get early access</span><span class="cs">Chci early access</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div>
+      <p class="eyebrow">
+        <span class="en">For independent e-commerce stores</span>
+        <span class="cs">Pro nezávislé e-shopy</span>
+      </p>
+      <h1 style="margin-top:14px">
+        <span class="en">Your supplier changed prices&nbsp;again.</span>
+        <span class="cs">Dodavatel zase změnil ceník.</span>
+      </h1>
+      <p class="lede">
+        <span class="en">Forward the price list — Excel, CSV, PDF, even a messy email attachment. PriceList&nbsp;Pilot matches it to your catalog, shows what it does to your margins, and updates your store. No column mapping. No copy-paste Sundays.</span>
+        <span class="cs">Přepošli ceník — Excel, CSV, PDF, klidně chaotickou přílohu e-mailu. PriceList&nbsp;Pilot ho spáruje s tvým katalogem, ukáže dopad na marže a aktualizuje tvůj e-shop. Žádné mapování sloupců. Žádné neděle s copy-paste.</span>
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="#early">
+          <span class="en">Join the early access list</span>
+          <span class="cs">Zapsat se do early accessu</span>
+        </a>
+        <span class="cta-note">
+          <span class="en">Free while in beta · launching 2026</span>
+          <span class="cs">Zdarma po dobu bety · start 2026</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="demo" role="img" aria-label="Example: a parsed supplier price list with detected changes">
+      <div class="filebar">
+        <span>📎</span>
+        <span class="fname mono">cenik_leto_final_v3 (2).xlsx</span>
+        <span>·</span>
+        <span><span class="en">received today 07:42 → parsed</span><span class="cs">přijato dnes 07:42 → zpracováno</span></span>
+      </div>
+      <table>
+        <tr>
+          <td>
+            <b>Thermo Mug 450&nbsp;ml</b><br>
+            <span class="sku mono">SKU TM-450 · <span class="en">cost</span><span class="cs">nákup</span> <span class="mono">118 → 139 Kč</span> <span class="delta up">+17.8%</span></span>
+          </td>
+          <td style="text-align:right">
+            <span class="chip bad"><span class="en">margin 34% → 22%</span><span class="cs">marže 34% → 22%</span></span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>Bamboo Lunchbox</b><br>
+            <span class="sku mono">SKU BL-200 · <span class="en">missing from new list</span><span class="cs">v novém ceníku chybí</span></span>
+          </td>
+          <td style="text-align:right">
+            <span class="chip warn"><span class="en">discontinued? 14 in stock</span><span class="cs">vyřazeno? 14 skladem</span></span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <b>Steel Straw Set (4+1)</b><br>
+            <span class="sku mono"><span class="en">new row · no SKU match</span><span class="cs">nový řádek · bez SKU</span></span>
+          </td>
+          <td style="text-align:right">
+            <span class="chip good"><span class="en">new product</span><span class="cs">nový produkt</span></span>
+          </td>
+        </tr>
+      </table>
+      <div class="foot">
+        <span class="muted" style="font-size:12.5px">
+          <span class="en">212 rows · 3 need your OK · rest auto-applied by your rules</span>
+          <span class="cs">212 řádků · 3 čekají na tvé OK · zbytek dle tvých pravidel</span>
+        </span>
+        <span class="stamp"><span class="en">margin leak caught</span><span class="cs">únik marže zachycen</span></span>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow"><span class="en">The problem</span><span class="cs">Problém</span></p>
+      <h2>
+        <span class="en">Price lists are where small shops quietly lose money</span>
+        <span class="cs">Na cenících malé e-shopy tiše prodělávají</span>
+      </h2>
+    </div>
+    <div class="grid3">
+      <div class="paincard">
+        <span class="pk">01 · <span class="en">hours</span><span class="cs">hodiny</span></span>
+        <h3><span class="en">Manual re-entry</span><span class="cs">Ruční přepisování</span></h3>
+        <p>
+          <span class="en">Every supplier has their own format, and it changes without warning. Merchants juggling dozens of brands re-key thousands of prices by hand — or pay a freelancer to do it, every single month.</span>
+          <span class="cs">Každý dodavatel má vlastní formát a mění ho bez varování. Obchodníci s desítkami značek ručně přepisují tisíce cen — nebo si na to každý měsíc platí freelancera.</span>
+        </p>
+      </div>
+      <div class="paincard">
+        <span class="pk">02 · <span class="en">margin</span><span class="cs">marže</span></span>
+        <h3><span class="en">The silent margin leak</span><span class="cs">Tichý únik marže</span></h3>
+        <p>
+          <span class="en">A supplier raises cost by 15%. Your sale price stays where it was. Nothing breaks, nothing alerts — you just earn less on every order until someone happens to notice.</span>
+          <span class="cs">Dodavatel zdraží o 15 %. Tvoje prodejní cena zůstane. Nic nespadne, nic tě neupozorní — jen na každé objednávce vyděláš míň, dokud si toho někdo náhodou nevšimne.</span>
+        </p>
+      </div>
+      <div class="paincard">
+        <span class="pk">03 · <span class="en">stock</span><span class="cs">sklad</span></span>
+        <h3><span class="en">Selling ghosts</span><span class="cs">Prodáváš duchy</span></h3>
+        <p>
+          <span class="en">The item vanished from the supplier's list two updates ago, but it's still live in your store. The customer orders, you can't deliver, and the refund email is on you.</span>
+          <span class="cs">Položka zmizela z ceníku před dvěma aktualizacemi, ale v e-shopu pořád visí. Zákazník objedná, ty nemáš co poslat — a omluvný e-mail píšeš ty.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow"><span class="en">How it works</span><span class="cs">Jak to funguje</span></p>
+      <h2>
+        <span class="en">From inbox to updated store in three steps</span>
+        <span class="cs">Z e-mailu do aktualizovaného e-shopu ve třech krocích</span>
+      </h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3><span class="en">Forward the price list</span><span class="cs">Přepošli ceník</span></h3>
+        <p>
+          <span class="en">Email attachment, upload, or a URL we watch for you. XLSX, CSV, XML or PDF — the AI reads the structure, whatever the supplier did to it this time.</span>
+          <span class="cs">Příloha e-mailu, upload, nebo URL, kterou hlídáme za tebe. XLSX, CSV, XML i PDF — AI si strukturu přečte, ať s ní dodavatel tentokrát provedl cokoli.</span>
+        </p>
+      </div>
+      <div class="step">
+        <h3><span class="en">Review the diff</span><span class="cs">Zkontroluj diff</span></h3>
+        <p>
+          <span class="en">Rows matched to your catalog by SKU, EAN or name. Price changes with margin impact, discontinued items, new products — sorted by what costs you money.</span>
+          <span class="cs">Řádky spárované s katalogem podle SKU, EAN nebo názvu. Změny cen s dopadem na marži, vyřazené položky, novinky — seřazené podle toho, co tě stojí peníze.</span>
+        </p>
+      </div>
+      <div class="step">
+        <h3><span class="en">Push to your store</span><span class="cs">Pošli do e-shopu</span></h3>
+        <p>
+          <span class="en">Apply with one click, or let your rules run: minimum margin, price rounding, auto-hide discontinued items. Full history of every change, always reversible.</span>
+          <span class="cs">Potvrď jedním klikem, nebo nech běžet pravidla: minimální marže, zaokrouhlování, automatické skrytí vyřazeného zboží. Kompletní historie změn, vše vratné.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow"><span class="en">What it guards</span><span class="cs">Co hlídá</span></p>
+      <h2>
+        <span class="en">A copilot that reads every list so you don't have to</span>
+        <span class="cs">Kopilot, který přečte každý ceník za tebe</span>
+      </h2>
+    </div>
+    <div class="watchlist">
+      <div class="watchitem"><span class="dot"></span><p><b><span class="en">Margin guard</span><span class="cs">Hlídání marží</span></b><span><span class="en">Alert when a cost change pushes any product under your minimum margin.</span><span class="cs">Upozornění, když změna nákupní ceny stlačí produkt pod tvou minimální marži.</span></span></p></div>
+      <div class="watchitem"><span class="dot"></span><p><b><span class="en">Discontinued detection</span><span class="cs">Detekce vyřazených položek</span></b><span><span class="en">Items that disappear from a supplier's list get flagged before customers order them.</span><span class="cs">Položky, které z ceníku zmizí, označíme dřív, než si je někdo objedná.</span></span></p></div>
+      <div class="watchitem"><span class="dot"></span><p><b><span class="en">New product feed</span><span class="cs">Přehled novinek</span></b><span><span class="en">New rows become import-ready drafts — with your pricing rules already applied.</span><span class="cs">Nové řádky se promění v připravené koncepty — s tvými cenovými pravidly.</span></span></p></div>
+      <div class="watchitem"><span class="dot"></span><p><b><span class="en">Multi-supplier memory</span><span class="cs">Paměť na dodavatele</span></b><span><span class="en">The parser remembers each supplier's quirks, so update #2 is fully automatic.</span><span class="cs">Parser si pamatuje zvyklosti každého dodavatele — druhá aktualizace už jede sama.</span></span></p></div>
+    </div>
+    <div class="platforms">
+      <span class="platform">Shopify</span>
+      <span class="platform">WooCommerce</span>
+      <span class="platform">Shoptet <small>CZ/SK</small></span>
+      <span class="platform">CSV / API <small><span class="en">everything else</span><span class="cs">vše ostatní</span></small></span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow"><span class="en">Why we're building this</span><span class="cs">Proč to stavíme</span></p>
+      <h2>
+        <span class="en">This pain is real — and today it's solved by hand</span>
+        <span class="cs">Tahle bolest je skutečná — a dnes se řeší ručně</span>
+      </h2>
+    </div>
+    <div class="evidence measure">
+      <p class="muted">
+        <span class="en">We don't do invented statistics or fake testimonials. Here is the actual evidence this problem deserves a real tool:</span>
+        <span class="cs">Neděláme vymyšlené statistiky ani falešné reference. Tady jsou skutečné důkazy, že si tenhle problém zaslouží pořádný nástroj:</span>
+      </p>
+      <ul>
+        <li>
+          <span class="en">Merchants on the Shopify forums ask how to update <a href="https://community.shopify.com/t/how-to-only-update-cost-and-prices-according-to-supplier-list/295931" rel="noopener">3,000 products across 150 brands from monthly supplier price lists</a> — and get workarounds, not solutions.</span>
+          <span class="cs">Obchodníci na Shopify fóru řeší, jak aktualizovat <a href="https://community.shopify.com/t/how-to-only-update-cost-and-prices-according-to-supplier-list/295931" rel="noopener">3 000 produktů napříč 150 značkami z měsíčních ceníků</a> — a dostávají obezličky, ne řešení.</span>
+        </li>
+        <li>
+          <span class="en">Whole categories of freelancers on <a href="https://www.upwork.com/hire/product-upload-freelancers/" rel="noopener">Upwork</a> and <a href="https://www.fiverr.com/categories/business/ecommerce-management/product-upload" rel="noopener">Fiverr</a> make a living re-keying supplier data into stores — humans hired as a patch for missing software.</span>
+          <span class="cs">Celé kategorie freelancerů na <a href="https://www.upwork.com/hire/product-upload-freelancers/" rel="noopener">Upworku</a> a <a href="https://www.fiverr.com/categories/business/ecommerce-management/product-upload" rel="noopener">Fiverru</a> se živí přepisováním dodavatelských dat do e-shopů — lidé najatí jako náplast za chybějící software.</span>
+        </li>
+        <li>
+          <span class="en">Existing feed tools expect clean, structured feeds and manual column mapping — their own reviews are full of merchants stuck on setup. Real supplier lists are messy spreadsheets and PDFs in your inbox.</span>
+          <span class="cs">Stávající feedové nástroje čekají čistý strukturovaný feed a ruční mapování sloupců — jejich vlastní recenze jsou plné obchodníků zaseklých na setupu. Skutečné ceníky jsou chaotické tabulky a PDF v e-mailu.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">FAQ</p>
+      <h2><span class="en">Fair questions</span><span class="cs">Férové otázky</span></h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary><span class="en">Will it read my supplier's weird format?</span><span class="cs">Přečte to i divný formát mého dodavatele?</span></summary>
+        <p class="a">
+          <span class="en">That's the whole point. The parser is AI-first: it reads header rows in any language, merged cells, tiered pricing, multi-sheet workbooks and table-in-PDF layouts. If a list genuinely can't be parsed, you'll see exactly which rows failed — nothing is silently guessed.</span>
+          <span class="cs">Přesně proto vzniká. Parser je AI-first: přečte hlavičky v libovolném jazyce, sloučené buňky, množstevní ceny, vícelistové sešity i tabulky v PDF. Když ceník opravdu přečíst nejde, uvidíš přesně, které řádky selhaly — nic se tiše nedomýšlí.</span>
+        </p>
+      </details>
+      <details>
+        <summary><span class="en">Is this another dropshipping tool?</span><span class="cs">Je to další dropshipping nástroj?</span></summary>
+        <p class="a">
+          <span class="en">No. Dropshipping apps sync their own marketplace catalogs. PriceList Pilot is for stores that buy from their own wholesale suppliers — the local distributor whose price list arrives as an Excel attachment, not an API.</span>
+          <span class="cs">Ne. Dropshippingové aplikace synchronizují vlastní marketplace katalogy. PriceList Pilot je pro e-shopy, které nakupují od vlastních velkoobchodních dodavatelů — od distributora, jehož ceník chodí jako příloha v Excelu, ne přes API.</span>
+        </p>
+      </details>
+      <details>
+        <summary><span class="en">What happens to my data?</span><span class="cs">Co se stane s mými daty?</span></summary>
+        <p class="a">
+          <span class="en">Your price lists and catalog stay yours. They're used only to run your account — never sold, never used to train models, and deletable on request. EU-hosted.</span>
+          <span class="cs">Ceníky i katalog zůstávají tvoje. Používají se jen pro běh tvého účtu — nikdy se neprodávají, netrénují se na nich modely a na požádání je smažeme. Hostováno v EU.</span>
+        </p>
+      </details>
+      <details>
+        <summary><span class="en">When does it launch and what will it cost?</span><span class="cs">Kdy to bude a kolik to bude stát?</span></summary>
+        <p class="a">
+          <span class="en">Private beta is planned for 2026. Early-access members use it free during beta and get founding pricing afterwards. We'll publish simple per-store pricing — no per-row surprises.</span>
+          <span class="cs">Privátní beta je v plánu na rok 2026. Členové early accessu ji mají zdarma a poté získají zakládající cenu. Ceník bude jednoduchý, za e-shop — žádná překvapení za řádek.</span>
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="final" id="early">
+    <p class="eyebrow"><span class="en">Early access</span><span class="cs">Early access</span></p>
+    <h2 style="margin-top:10px">
+      <span class="en">Send us one real price list. We'll show you the diff.</span>
+      <span class="cs">Pošli nám jeden skutečný ceník. Ukážeme ti diff.</span>
+    </h2>
+    <p class="lede measure" style="margin-top:14px;color:var(--ink-soft)">
+      <span class="en">Join the list and be first in the private beta. If you attach a supplier price list (feel free to anonymize prices), we'll personally send back what PriceList Pilot sees in it.</span>
+      <span class="cs">Zapiš se a buď první v privátní betě. Když přiložíš dodavatelský ceník (klidně s anonymizovanými cenami), osobně ti pošleme zpátky, co v něm PriceList Pilot vidí.</span>
+    </p>
+    <a class="btn" href="mailto:zdenek.brdy@email.cz?subject=PriceList%20Pilot%20%E2%80%94%20early%20access">
+      <span class="en">Join early access by email</span>
+      <span class="cs">Zapsat se e-mailem</span>
+    </a>
+    <p class="cta-note" style="margin-top:12px">
+      <span class="en">One email when the beta opens. No newsletter, no spam.</span>
+      <span class="cs">Jeden e-mail, až se otevře beta. Žádný newsletter, žádný spam.</span>
+    </p>
+  </section>
+
+  <footer>
+    <span>© 2026 PriceList Pilot · <span class="en">Built by</span><span class="cs">Vytváří</span> <a href="https://www.upwork.com/freelancers/~0152451c5a66cd6d48" rel="noopener">Zdeněk Bradáč</a></span>
+    <span><a href="mailto:zdenek.brdy@email.cz">zdenek.brdy@email.cz</a></span>
+  </footer>
+
+</div>
+
+<script>
+  (function(){
+    var root=document.documentElement, btn=document.getElementById('langBtn');
+    function apply(l){
+      if(l==='cs'){root.setAttribute('data-lang','cs');root.lang='cs';btn.textContent='EN';}
+      else{root.removeAttribute('data-lang');root.lang='en';btn.textContent='CZ';}
+    }
+    var saved=null;
+    try{saved=localStorage.getItem('plp-lang');}catch(e){}
+    apply(saved || ((navigator.language||'').toLowerCase().indexOf('cs')===0?'cs':'en'));
+    btn.addEventListener('click',function(){
+      var next=root.getAttribute('data-lang')==='cs'?'en':'cs';
+      try{localStorage.setItem('plp-lang',next);}catch(e){}
+      apply(next);
+    });
+  })();
+</script>
+</body>
+</html>
