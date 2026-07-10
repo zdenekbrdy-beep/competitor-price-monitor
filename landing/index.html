@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PriceList Pilot — supplier price lists, handled</title>
-<meta name="description" content="Forward any supplier price list — Excel, CSV, PDF, even an email attachment. PriceList Pilot maps it to your catalog, shows the margin impact, and updates your store.">
+<title>PriceList Pilot: supplier price lists, handled</title>
+<meta name="description" content="Forward any supplier price list. PriceList Pilot maps it to your catalog, shows the margin impact, and updates your store.">
 <style>
   :root{
     --paper:#FAFAF7;
@@ -183,19 +183,20 @@
   .paincard h3::after{content:"";display:block;width:34px;height:2px;background:var(--margin-red);margin-top:10px;opacity:.7}
   .paincard p{color:var(--ink-soft);font-size:15.5px;margin-top:10px}
 
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;counter-reset:step}
-  @media (max-width:820px){.steps{grid-template-columns:1fr}}
-  .step{background:var(--card);border:1px solid var(--card-line);border-radius:8px;padding:22px}
+  /* vertical numbered flow with connector line, distinct from the 3-col grid above it */
+  .steps{counter-reset:step;max-width:720px;position:relative}
+  .steps::before{content:"";position:absolute;left:15px;top:20px;bottom:26px;width:1.5px;background:var(--rule)}
+  .step{display:grid;grid-template-columns:30px 1fr;column-gap:20px;padding:18px 0;position:relative}
   .step::before{
     counter-increment:step;content:counter(step);
+    grid-column:1;grid-row:1;
     display:inline-flex;align-items:center;justify-content:center;
     width:30px;height:30px;border-radius:50%;
     background:var(--accent);color:var(--accent-ink);
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;font-size:14px;
-    margin-bottom:14px;
   }
-  .step h3{margin-bottom:8px}
-  .step p{color:var(--ink-soft);font-size:15.5px}
+  .step h3{grid-column:2;margin-bottom:8px;align-self:center}
+  .step p{grid-column:2;color:var(--ink-soft);font-size:15.5px}
 
   .watchlist{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;max-width:760px}
   @media (max-width:680px){.watchlist{grid-template-columns:1fr}}
@@ -235,7 +236,7 @@
   :root[data-lang="cs"] .en{display:none !important}
   :root:not([data-lang="cs"]) .cs{display:none !important}
 
-  /* hero demo: one orchestrated moment — file arrives, rows parse in, stamp lands */
+  /* hero demo: one orchestrated moment. file arrives, rows parse in, stamp lands */
   @media (prefers-reduced-motion: no-preference){
     .demo{animation:cardin .6s cubic-bezier(.16,1,.3,1) both}
     .demo tr{animation:rowin .55s cubic-bezier(.16,1,.3,1) both}
@@ -277,8 +278,8 @@
         <span class="cs">Dodavatel zase změnil ceník.</span>
       </h1>
       <p class="lede">
-        <span class="en">Forward the price list — Excel, CSV, PDF, even a messy email attachment. PriceList&nbsp;Pilot matches it to your catalog, shows what it does to your margins, and updates your store. No column mapping. No copy-paste Sundays.</span>
-        <span class="cs">Přepošli ceník — Excel, CSV, PDF, klidně chaotickou přílohu e-mailu. PriceList&nbsp;Pilot ho spáruje s tvým katalogem, ukáže dopad na marže a aktualizuje tvůj e-shop. Žádné mapování sloupců. Žádné neděle s copy-paste.</span>
+        <span class="en">Forward any supplier price list. PriceList&nbsp;Pilot matches it to your catalog, shows the margin impact, and updates your store.</span>
+        <span class="cs">Přepošli jakýkoli ceník od dodavatele. PriceList&nbsp;Pilot ho spáruje s katalogem, ukáže dopad na marže a aktualizuje tvůj e-shop.</span>
       </p>
       <div class="cta-row">
         <a class="btn" href="#early">
@@ -286,8 +287,8 @@
           <span class="cs">Zapsat se do early accessu</span>
         </a>
         <span class="cta-note">
-          <span class="en">Free while in beta · launching 2026</span>
-          <span class="cs">Zdarma po dobu bety · start 2026</span>
+          <span class="en">XLSX, CSV, PDF or email · Free while in beta</span>
+          <span class="cs">XLSX, CSV, PDF i e-mail · Zdarma po dobu bety</span>
         </span>
       </div>
     </div>
@@ -349,22 +350,22 @@
       <div class="paincard">
         <h3><span class="en">Manual re-entry</span><span class="cs">Ruční přepisování</span></h3>
         <p>
-          <span class="en">Every supplier has their own format, and it changes without warning. Merchants juggling dozens of brands re-key thousands of prices by hand — or pay a freelancer to do it, every single month.</span>
-          <span class="cs">Každý dodavatel má vlastní formát a mění ho bez varování. Obchodníci s desítkami značek ručně přepisují tisíce cen — nebo si na to každý měsíc platí freelancera.</span>
+          <span class="en">Every supplier has their own format, and it changes without warning. Merchants juggling dozens of brands re-key thousands of prices by hand, or pay a freelancer to do it, every single month.</span>
+          <span class="cs">Každý dodavatel má vlastní formát a mění ho bez varování. Obchodníci s desítkami značek ručně přepisují tisíce cen, nebo si na to každý měsíc platí freelancera.</span>
         </p>
       </div>
       <div class="paincard">
         <h3><span class="en">The silent margin leak</span><span class="cs">Tichý únik marže</span></h3>
         <p>
-          <span class="en">A supplier raises cost by 15%. Your sale price stays where it was. Nothing breaks, nothing alerts — you just earn less on every order until someone happens to notice.</span>
-          <span class="cs">Dodavatel zdraží o 15 %. Tvoje prodejní cena zůstane. Nic nespadne, nic tě neupozorní — jen na každé objednávce vyděláš míň, dokud si toho někdo náhodou nevšimne.</span>
+          <span class="en">A supplier raises cost by 15%. Your sale price stays where it was. Nothing breaks, nothing alerts. You just earn less on every order until someone happens to notice.</span>
+          <span class="cs">Dodavatel zdraží o 15 %. Tvoje prodejní cena zůstane. Nic nespadne, nic tě neupozorní. Jen na každé objednávce vyděláš míň, dokud si toho někdo náhodou nevšimne.</span>
         </p>
       </div>
       <div class="paincard">
         <h3><span class="en">Selling ghosts</span><span class="cs">Prodáváš duchy</span></h3>
         <p>
           <span class="en">The item vanished from the supplier's list two updates ago, but it's still live in your store. The customer orders, you can't deliver, and the refund email is on you.</span>
-          <span class="cs">Položka zmizela z ceníku před dvěma aktualizacemi, ale v e-shopu pořád visí. Zákazník objedná, ty nemáš co poslat — a omluvný e-mail píšeš ty.</span>
+          <span class="cs">Položka zmizela z ceníku před dvěma aktualizacemi, ale v e-shopu pořád visí. Zákazník objedná, ty nemáš co poslat. A omluvný e-mail píšeš ty.</span>
         </p>
       </div>
     </div>
@@ -381,15 +382,15 @@
       <div class="step">
         <h3><span class="en">Forward the price list</span><span class="cs">Přepošli ceník</span></h3>
         <p>
-          <span class="en">Email attachment, upload, or a URL we watch for you. XLSX, CSV, XML or PDF — the AI reads the structure, whatever the supplier did to it this time.</span>
-          <span class="cs">Příloha e-mailu, upload, nebo URL, kterou hlídáme za tebe. XLSX, CSV, XML i PDF — AI si strukturu přečte, ať s ní dodavatel tentokrát provedl cokoli.</span>
+          <span class="en">Email attachment, upload, or a URL we watch for you. XLSX, CSV, XML or PDF: the AI reads the structure, whatever the supplier did to it this time.</span>
+          <span class="cs">Příloha e-mailu, upload, nebo URL, kterou hlídáme za tebe. XLSX, CSV, XML i PDF: AI si strukturu přečte, ať s ní dodavatel tentokrát provedl cokoli.</span>
         </p>
       </div>
       <div class="step">
         <h3><span class="en">Review the diff</span><span class="cs">Zkontroluj diff</span></h3>
         <p>
-          <span class="en">Rows matched to your catalog by SKU, EAN or name. Price changes with margin impact, discontinued items, new products — sorted by what costs you money.</span>
-          <span class="cs">Řádky spárované s katalogem podle SKU, EAN nebo názvu. Změny cen s dopadem na marži, vyřazené položky, novinky — seřazené podle toho, co tě stojí peníze.</span>
+          <span class="en">Rows matched to your catalog by SKU, EAN or name. Price changes with margin impact, discontinued items, new products. Sorted by what costs you money.</span>
+          <span class="cs">Řádky spárované s katalogem podle SKU, EAN nebo názvu. Změny cen s dopadem na marži, vyřazené položky, novinky. Seřazené podle toho, co tě stojí peníze.</span>
         </p>
       </div>
       <div class="step">
@@ -412,8 +413,8 @@
     <div class="watchlist">
       <div class="watchitem"><span class="dot"></span><p><b><span class="en">Margin guard</span><span class="cs">Hlídání marží</span></b><span><span class="en">Alert when a cost change pushes any product under your minimum margin.</span><span class="cs">Upozornění, když změna nákupní ceny stlačí produkt pod tvou minimální marži.</span></span></p></div>
       <div class="watchitem"><span class="dot"></span><p><b><span class="en">Discontinued detection</span><span class="cs">Detekce vyřazených položek</span></b><span><span class="en">Items that disappear from a supplier's list get flagged before customers order them.</span><span class="cs">Položky, které z ceníku zmizí, označíme dřív, než si je někdo objedná.</span></span></p></div>
-      <div class="watchitem"><span class="dot"></span><p><b><span class="en">New product feed</span><span class="cs">Přehled novinek</span></b><span><span class="en">New rows become import-ready drafts — with your pricing rules already applied.</span><span class="cs">Nové řádky se promění v připravené koncepty — s tvými cenovými pravidly.</span></span></p></div>
-      <div class="watchitem"><span class="dot"></span><p><b><span class="en">Multi-supplier memory</span><span class="cs">Paměť na dodavatele</span></b><span><span class="en">The parser remembers each supplier's quirks, so update #2 is fully automatic.</span><span class="cs">Parser si pamatuje zvyklosti každého dodavatele — druhá aktualizace už jede sama.</span></span></p></div>
+      <div class="watchitem"><span class="dot"></span><p><b><span class="en">New product feed</span><span class="cs">Přehled novinek</span></b><span><span class="en">New rows become import-ready drafts, with your pricing rules already applied.</span><span class="cs">Nové řádky se promění v připravené koncepty, s tvými cenovými pravidly.</span></span></p></div>
+      <div class="watchitem"><span class="dot"></span><p><b><span class="en">Multi-supplier memory</span><span class="cs">Paměť na dodavatele</span></b><span><span class="en">The parser remembers each supplier's quirks, so update #2 is fully automatic.</span><span class="cs">Parser si pamatuje zvyklosti každého dodavatele. Druhá aktualizace už jede sama.</span></span></p></div>
     </div>
     <div class="platforms">
       <span class="platform">Shopify</span>
@@ -426,8 +427,8 @@
   <section>
     <div class="sec-head">
       <h2>
-        <span class="en">This pain is real — and today it's solved by hand</span>
-        <span class="cs">Tahle bolest je skutečná — a dnes se řeší ručně</span>
+        <span class="en">This pain is real, and today it's solved by hand</span>
+        <span class="cs">Tahle bolest je skutečná. A dnes se řeší ručně</span>
       </h2>
     </div>
     <div class="evidence measure">
@@ -437,16 +438,16 @@
       </p>
       <ul>
         <li>
-          <span class="en">Merchants on the Shopify forums ask how to update <a href="https://community.shopify.com/t/how-to-only-update-cost-and-prices-according-to-supplier-list/295931" rel="noopener">3,000 products across 150 brands from monthly supplier price lists</a> — and get workarounds, not solutions.</span>
-          <span class="cs">Obchodníci na Shopify fóru řeší, jak aktualizovat <a href="https://community.shopify.com/t/how-to-only-update-cost-and-prices-according-to-supplier-list/295931" rel="noopener">3 000 produktů napříč 150 značkami z měsíčních ceníků</a> — a dostávají obezličky, ne řešení.</span>
+          <span class="en">Merchants on the Shopify forums ask how to update <a href="https://community.shopify.com/t/how-to-only-update-cost-and-prices-according-to-supplier-list/295931" rel="noopener">3,000 products across 150 brands from monthly supplier price lists</a>, and get workarounds instead of solutions.</span>
+          <span class="cs">Obchodníci na Shopify fóru řeší, jak aktualizovat <a href="https://community.shopify.com/t/how-to-only-update-cost-and-prices-according-to-supplier-list/295931" rel="noopener">3 000 produktů napříč 150 značkami z měsíčních ceníků</a>, a dostávají obezličky, ne řešení.</span>
         </li>
         <li>
-          <span class="en">Whole categories of freelancers on <a href="https://www.upwork.com/hire/product-upload-freelancers/" rel="noopener">Upwork</a> and <a href="https://www.fiverr.com/categories/business/ecommerce-management/product-upload" rel="noopener">Fiverr</a> make a living re-keying supplier data into stores — humans hired as a patch for missing software.</span>
-          <span class="cs">Celé kategorie freelancerů na <a href="https://www.upwork.com/hire/product-upload-freelancers/" rel="noopener">Upworku</a> a <a href="https://www.fiverr.com/categories/business/ecommerce-management/product-upload" rel="noopener">Fiverru</a> se živí přepisováním dodavatelských dat do e-shopů — lidé najatí jako náplast za chybějící software.</span>
+          <span class="en">Whole categories of freelancers on <a href="https://www.upwork.com/hire/product-upload-freelancers/" rel="noopener">Upwork</a> and <a href="https://www.fiverr.com/categories/business/ecommerce-management/product-upload" rel="noopener">Fiverr</a> make a living re-keying supplier data into stores. Humans hired as a patch for missing software.</span>
+          <span class="cs">Celé kategorie freelancerů na <a href="https://www.upwork.com/hire/product-upload-freelancers/" rel="noopener">Upworku</a> a <a href="https://www.fiverr.com/categories/business/ecommerce-management/product-upload" rel="noopener">Fiverru</a> se živí přepisováním dodavatelských dat do e-shopů. Lidé najatí jako náplast za chybějící software.</span>
         </li>
         <li>
-          <span class="en">Existing feed tools expect clean, structured feeds and manual column mapping — their own reviews are full of merchants stuck on setup. Real supplier lists are messy spreadsheets and PDFs in your inbox.</span>
-          <span class="cs">Stávající feedové nástroje čekají čistý strukturovaný feed a ruční mapování sloupců — jejich vlastní recenze jsou plné obchodníků zaseklých na setupu. Skutečné ceníky jsou chaotické tabulky a PDF v e-mailu.</span>
+          <span class="en">Existing feed tools expect clean, structured feeds and manual column mapping. Their own reviews are full of merchants stuck on setup. Real supplier lists are messy spreadsheets and PDFs in your inbox.</span>
+          <span class="cs">Stávající feedové nástroje čekají čistý strukturovaný feed a ruční mapování sloupců. Jejich vlastní recenze jsou plné obchodníků zaseklých na setupu. Skutečné ceníky jsou chaotické tabulky a PDF v e-mailu.</span>
         </li>
       </ul>
     </div>
@@ -460,29 +461,29 @@
       <details>
         <summary><span class="en">Will it read my supplier's weird format?</span><span class="cs">Přečte to i divný formát mého dodavatele?</span></summary>
         <p class="a">
-          <span class="en">That's the whole point. The parser is AI-first: it reads header rows in any language, merged cells, tiered pricing, multi-sheet workbooks and table-in-PDF layouts. If a list genuinely can't be parsed, you'll see exactly which rows failed — nothing is silently guessed.</span>
-          <span class="cs">Přesně proto vzniká. Parser je AI-first: přečte hlavičky v libovolném jazyce, sloučené buňky, množstevní ceny, vícelistové sešity i tabulky v PDF. Když ceník opravdu přečíst nejde, uvidíš přesně, které řádky selhaly — nic se tiše nedomýšlí.</span>
+          <span class="en">That's the whole point. The parser is AI-first: it reads header rows in any language, merged cells, tiered pricing, multi-sheet workbooks and table-in-PDF layouts. If a list genuinely can't be parsed, you'll see exactly which rows failed. Nothing is silently guessed.</span>
+          <span class="cs">Přesně proto vzniká. Parser je AI-first: přečte hlavičky v libovolném jazyce, sloučené buňky, množstevní ceny, vícelistové sešity i tabulky v PDF. Když ceník opravdu přečíst nejde, uvidíš přesně, které řádky selhaly. Nic se tiše nedomýšlí.</span>
         </p>
       </details>
       <details>
         <summary><span class="en">Is this another dropshipping tool?</span><span class="cs">Je to další dropshipping nástroj?</span></summary>
         <p class="a">
-          <span class="en">No. Dropshipping apps sync their own marketplace catalogs. PriceList Pilot is for stores that buy from their own wholesale suppliers — the local distributor whose price list arrives as an Excel attachment, not an API.</span>
-          <span class="cs">Ne. Dropshippingové aplikace synchronizují vlastní marketplace katalogy. PriceList Pilot je pro e-shopy, které nakupují od vlastních velkoobchodních dodavatelů — od distributora, jehož ceník chodí jako příloha v Excelu, ne přes API.</span>
+          <span class="en">No. Dropshipping apps sync their own marketplace catalogs. PriceList Pilot is for stores that buy from their own wholesale suppliers: the local distributor whose price list arrives as an Excel attachment, not an API.</span>
+          <span class="cs">Ne. Dropshippingové aplikace synchronizují vlastní marketplace katalogy. PriceList Pilot je pro e-shopy, které nakupují od vlastních velkoobchodních dodavatelů. Od distributora, jehož ceník chodí jako příloha v Excelu, ne přes API.</span>
         </p>
       </details>
       <details>
         <summary><span class="en">What happens to my data?</span><span class="cs">Co se stane s mými daty?</span></summary>
         <p class="a">
-          <span class="en">Your price lists and catalog stay yours. They're used only to run your account — never sold, never used to train models, and deletable on request. EU-hosted.</span>
-          <span class="cs">Ceníky i katalog zůstávají tvoje. Používají se jen pro běh tvého účtu — nikdy se neprodávají, netrénují se na nich modely a na požádání je smažeme. Hostováno v EU.</span>
+          <span class="en">Your price lists and catalog stay yours. They're used only to run your account. Never sold, never used to train models, and deletable on request. EU-hosted.</span>
+          <span class="cs">Ceníky i katalog zůstávají tvoje. Používají se jen pro běh tvého účtu. Nikdy se neprodávají, netrénují se na nich modely a na požádání je smažeme. Hostováno v EU.</span>
         </p>
       </details>
       <details>
         <summary><span class="en">When does it launch and what will it cost?</span><span class="cs">Kdy to bude a kolik to bude stát?</span></summary>
         <p class="a">
-          <span class="en">Private beta is planned for 2026. Early-access members use it free during beta and get founding pricing afterwards. We'll publish simple per-store pricing — no per-row surprises.</span>
-          <span class="cs">Privátní beta je v plánu na rok 2026. Členové early accessu ji mají zdarma a poté získají zakládající cenu. Ceník bude jednoduchý, za e-shop — žádná překvapení za řádek.</span>
+          <span class="en">Private beta is planned for 2026. Early-access members use it free during beta and get founding pricing afterwards. We'll publish simple per-store pricing with no per-row surprises.</span>
+          <span class="cs">Privátní beta je v plánu na rok 2026. Členové early accessu ji mají zdarma a poté získají zakládající cenu. Ceník bude jednoduchý, za e-shop, žádná překvapení za řádek.</span>
         </p>
       </details>
     </div>
