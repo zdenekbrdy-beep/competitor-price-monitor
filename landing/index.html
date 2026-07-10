@@ -84,15 +84,15 @@
   }
 
   h1,h2,h3{font-family:Rockwell,"Roboto Slab","Zilla Slab",Charter,Georgia,serif;line-height:1.15;text-wrap:balance;margin:0}
-  h1{font-size:clamp(34px,5.4vw,56px);font-weight:700;letter-spacing:-.01em}
+  h1{font-size:clamp(36px,5.8vw,64px);font-weight:700;letter-spacing:-.02em;line-height:1.05}
   h2{font-size:clamp(24px,3.4vw,34px);font-weight:700}
   h3{font-size:19px;font-weight:700}
-  p{margin:0}
+  p{margin:0;text-wrap:pretty}
   a{color:var(--accent)}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-variant-numeric:tabular-nums}
-  .eyebrow{
-    font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--margin-red);
-    font-weight:600;
+  .annot{
+    font-family:Rockwell,"Roboto Slab",Charter,Georgia,serif;font-style:italic;
+    font-size:16px;color:var(--margin-red);
   }
   .muted{color:var(--ink-soft)}
   .measure{max-width:62ch}
@@ -107,15 +107,22 @@
   .lang{
     border:1.5px solid var(--rule);background:transparent;color:var(--ink-soft);
     border-radius:4px;padding:5px 10px;font:600 13px/1 inherit;cursor:pointer;
+    transition:color .15s cubic-bezier(.22,1,.36,1),border-color .15s cubic-bezier(.22,1,.36,1);
   }
-  .lang:hover{color:var(--ink)}
+  @media (hover:hover){
+    .lang:hover{color:var(--ink);border-color:var(--ink-soft)}
+  }
 
   .btn{
     display:inline-block;background:var(--accent);color:var(--accent-ink);
     text-decoration:none;font-weight:650;font-size:15.5px;
     padding:12px 22px;border-radius:4px;border:none;cursor:pointer;
+    transition:transform .15s cubic-bezier(.22,1,.36,1),filter .15s cubic-bezier(.22,1,.36,1);
   }
-  .btn:hover{filter:brightness(1.07)}
+  @media (hover:hover){
+    .btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+  }
+  .btn:active{transform:translateY(0) scale(.985)}
   .btn.small{padding:8px 14px;font-size:13.5px}
   .btn:focus-visible,.lang:focus-visible,a:focus-visible{outline:2.5px solid var(--margin-red);outline-offset:2px}
 
@@ -139,6 +146,12 @@
   .demo td{padding:11px 14px;border-top:1px solid var(--card-line);vertical-align:top}
   .demo tr:first-child td{border-top:none}
   .demo .sku{color:var(--ink-soft);font-size:12px}
+  .demo .act{text-align:right}
+  @media (max-width:560px){
+    .demo td{display:block}
+    .demo td.act{border-top:none;padding-top:0;text-align:left}
+    .demo .filebar{flex-wrap:wrap}
+  }
   .chip{
     display:inline-block;border-radius:3px;padding:2px 8px;font-size:12px;font-weight:650;
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:nowrap;
@@ -160,21 +173,19 @@
     padding:4px 9px;transform:rotate(-2deg);opacity:.9;
   }
 
-  section{padding:56px 0;border-top:1.5px solid var(--rule)}
-  .sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:34px}
+  section{padding:64px 0 72px;border-top:1.5px solid var(--rule)}
+  .sec-head{margin-bottom:36px}
+  .sec-head h2{max-width:24ch}
 
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 30px}
   @media (max-width:820px){.grid3{grid-template-columns:1fr}}
   .paincard h3{margin-bottom:8px}
-  .paincard p{color:var(--ink-soft);font-size:15.5px}
-  .paincard .pk{
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    color:var(--margin-red);font-size:13px;font-weight:700;display:block;margin-bottom:10px;
-  }
+  .paincard h3::after{content:"";display:block;width:34px;height:2px;background:var(--margin-red);margin-top:10px;opacity:.7}
+  .paincard p{color:var(--ink-soft);font-size:15.5px;margin-top:10px}
 
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;counter-reset:step}
   @media (max-width:820px){.steps{grid-template-columns:1fr}}
-  .step{background:var(--card);border:1px solid var(--card-line);border-radius:8px;padding:22px;box-shadow:var(--shadow)}
+  .step{background:var(--card);border:1px solid var(--card-line);border-radius:8px;padding:22px}
   .step::before{
     counter-increment:step;content:counter(step);
     display:inline-flex;align-items:center;justify-content:center;
@@ -200,18 +211,21 @@
   }
   .platform small{display:block;font-weight:500;color:var(--ink-soft);font-size:12px}
 
-  .evidence{background:var(--card);border:1px solid var(--card-line);border-radius:8px;padding:26px;box-shadow:var(--shadow)}
-  .evidence ul{margin:14px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:10px}
+  /* ledger "totals" treatment: double rules, no card */
+  .evidence{border-top:3px double var(--margin-red);border-bottom:3px double var(--margin-red);padding:24px 0 26px}
+  .evidence ul{margin:16px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:12px}
   .evidence li{color:var(--ink-soft);font-size:15px}
+  .evidence a{text-underline-offset:3px}
 
   .faq{max-width:760px;display:flex;flex-direction:column;gap:8px}
   .faq details{border:1px solid var(--card-line);border-radius:6px;background:var(--card);padding:0}
   .faq summary{cursor:pointer;font-weight:650;padding:15px 18px;list-style:none;display:flex;justify-content:space-between;gap:12px}
-  .faq summary::after{content:"+";color:var(--margin-red);font-weight:700}
-  .faq details[open] summary::after{content:"–"}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";color:var(--margin-red);font-weight:700;transition:transform .2s cubic-bezier(.22,1,.36,1)}
+  .faq details[open] summary::after{transform:rotate(45deg)}
   .faq .a{padding:0 18px 16px;color:var(--ink-soft);font-size:15.5px;max-width:65ch}
 
-  .final{padding:72px 0;text-align:left}
+  .final{padding:88px 0 96px;text-align:left}
   .final .btn{margin-top:24px}
 
   footer{border-top:1.5px solid var(--rule);padding:26px 0 48px;font-size:13.5px;color:var(--ink-soft);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -221,11 +235,21 @@
   :root[data-lang="cs"] .en{display:none !important}
   :root:not([data-lang="cs"]) .cs{display:none !important}
 
+  /* hero demo: one orchestrated moment — file arrives, rows parse in, stamp lands */
   @media (prefers-reduced-motion: no-preference){
-    .demo tr{animation:rowin .5s ease both}
-    .demo tr:nth-child(2){animation-delay:.15s}
-    .demo tr:nth-child(3){animation-delay:.3s}
-    @keyframes rowin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .demo{animation:cardin .6s cubic-bezier(.16,1,.3,1) both}
+    .demo tr{animation:rowin .55s cubic-bezier(.16,1,.3,1) both}
+    .demo tr:nth-child(1){animation-delay:.35s}
+    .demo tr:nth-child(2){animation-delay:.5s}
+    .demo tr:nth-child(3){animation-delay:.65s}
+    .demo .foot .muted{animation:rowin .55s cubic-bezier(.16,1,.3,1) .85s both}
+    .demo .stamp{animation:stampin .4s cubic-bezier(.16,1,.3,1) 1.05s both}
+    @keyframes cardin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+    @keyframes rowin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    @keyframes stampin{
+      from{opacity:0;transform:rotate(-8deg) scale(1.35)}
+      to{opacity:.9;transform:rotate(-2deg) scale(1)}
+    }
   }
 </style>
 </head>
@@ -244,7 +268,7 @@
 
   <div class="hero">
     <div>
-      <p class="eyebrow">
+      <p class="annot">
         <span class="en">For independent e-commerce stores</span>
         <span class="cs">Pro nezávislé e-shopy</span>
       </p>
@@ -281,7 +305,7 @@
             <b>Thermo Mug 450&nbsp;ml</b><br>
             <span class="sku mono">SKU TM-450 · <span class="en">cost</span><span class="cs">nákup</span> <span class="mono">118 → 139 Kč</span> <span class="delta up">+17.8%</span></span>
           </td>
-          <td style="text-align:right">
+          <td class="act">
             <span class="chip bad"><span class="en">margin 34% → 22%</span><span class="cs">marže 34% → 22%</span></span>
           </td>
         </tr>
@@ -290,7 +314,7 @@
             <b>Bamboo Lunchbox</b><br>
             <span class="sku mono">SKU BL-200 · <span class="en">missing from new list</span><span class="cs">v novém ceníku chybí</span></span>
           </td>
-          <td style="text-align:right">
+          <td class="act">
             <span class="chip warn"><span class="en">discontinued? 14 in stock</span><span class="cs">vyřazeno? 14 skladem</span></span>
           </td>
         </tr>
@@ -299,7 +323,7 @@
             <b>Steel Straw Set (4+1)</b><br>
             <span class="sku mono"><span class="en">new row · no SKU match</span><span class="cs">nový řádek · bez SKU</span></span>
           </td>
-          <td style="text-align:right">
+          <td class="act">
             <span class="chip good"><span class="en">new product</span><span class="cs">nový produkt</span></span>
           </td>
         </tr>
@@ -316,7 +340,6 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow"><span class="en">The problem</span><span class="cs">Problém</span></p>
       <h2>
         <span class="en">Price lists are where small shops quietly lose money</span>
         <span class="cs">Na cenících malé e-shopy tiše prodělávají</span>
@@ -324,7 +347,6 @@
     </div>
     <div class="grid3">
       <div class="paincard">
-        <span class="pk">01 · <span class="en">hours</span><span class="cs">hodiny</span></span>
         <h3><span class="en">Manual re-entry</span><span class="cs">Ruční přepisování</span></h3>
         <p>
           <span class="en">Every supplier has their own format, and it changes without warning. Merchants juggling dozens of brands re-key thousands of prices by hand — or pay a freelancer to do it, every single month.</span>
@@ -332,7 +354,6 @@
         </p>
       </div>
       <div class="paincard">
-        <span class="pk">02 · <span class="en">margin</span><span class="cs">marže</span></span>
         <h3><span class="en">The silent margin leak</span><span class="cs">Tichý únik marže</span></h3>
         <p>
           <span class="en">A supplier raises cost by 15%. Your sale price stays where it was. Nothing breaks, nothing alerts — you just earn less on every order until someone happens to notice.</span>
@@ -340,7 +361,6 @@
         </p>
       </div>
       <div class="paincard">
-        <span class="pk">03 · <span class="en">stock</span><span class="cs">sklad</span></span>
         <h3><span class="en">Selling ghosts</span><span class="cs">Prodáváš duchy</span></h3>
         <p>
           <span class="en">The item vanished from the supplier's list two updates ago, but it's still live in your store. The customer orders, you can't deliver, and the refund email is on you.</span>
@@ -352,7 +372,6 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow"><span class="en">How it works</span><span class="cs">Jak to funguje</span></p>
       <h2>
         <span class="en">From inbox to updated store in three steps</span>
         <span class="cs">Z e-mailu do aktualizovaného e-shopu ve třech krocích</span>
@@ -385,7 +404,6 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow"><span class="en">What it guards</span><span class="cs">Co hlídá</span></p>
       <h2>
         <span class="en">A copilot that reads every list so you don't have to</span>
         <span class="cs">Kopilot, který přečte každý ceník za tebe</span>
@@ -407,7 +425,6 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow"><span class="en">Why we're building this</span><span class="cs">Proč to stavíme</span></p>
       <h2>
         <span class="en">This pain is real — and today it's solved by hand</span>
         <span class="cs">Tahle bolest je skutečná — a dnes se řeší ručně</span>
@@ -437,7 +454,6 @@
 
   <section>
     <div class="sec-head">
-      <p class="eyebrow">FAQ</p>
       <h2><span class="en">Fair questions</span><span class="cs">Férové otázky</span></h2>
     </div>
     <div class="faq">
@@ -473,8 +489,7 @@
   </section>
 
   <section class="final" id="early">
-    <p class="eyebrow"><span class="en">Early access</span><span class="cs">Early access</span></p>
-    <h2 style="margin-top:10px">
+    <h2>
       <span class="en">Send us one real price list. We'll show you the diff.</span>
       <span class="cs">Pošli nám jeden skutečný ceník. Ukážeme ti diff.</span>
     </h2>
